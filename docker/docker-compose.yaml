@@ -1,0 +1,28 @@
+services:
+
+  php-8.1:
+    tty: true
+    build:
+      context: .
+      args:
+        PHP_VERSION: 8.1
+    volumes:
+        - ..:/app
+
+  php-8.2:
+    tty: true
+    build:
+      context: .
+      args:
+        PHP_VERSION: 8.2
+    volumes:
+      - ..:/app
+
+  php-8.3:
+    tty: true
+    build:
+      context: .
+      args:
+        PHP_VERSION: 8.3
+    volumes:
+      - ..:/app
