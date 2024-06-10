@@ -28,6 +28,13 @@ bash-8.2: ## Start a shell in the PHP 8.2 container
 bash-8.3: ## Start a shell in the PHP 8.3 container
 	$(DOCKER_COMPOSE) exec php-8.3 $(EXEC_SHELL)
 
+### QA
+
+local-ci: ## Run the Composer "local-ci" script in every containers
+	$(DOCKER_COMPOSE) exec php-8.1 $(EXEC_SHELL) -c "composer local-ci"
+	$(DOCKER_COMPOSE) exec php-8.2 $(EXEC_SHELL) -c "composer local-ci"
+	$(DOCKER_COMPOSE) exec php-8.3 $(EXEC_SHELL) -c "composer local-ci"
+
 ### Misc
 
 help: ## Display this help
