@@ -22,5 +22,6 @@ return (new PhpCsFixer\Config())
         'native_constant_invocation' => ['strict' => false],
         'native_function_invocation' => ['include' => ['@all'], 'scope' => 'namespaced', 'strict' => true],
         'ordered_class_elements' => ['order' => ['use_trait', 'public', 'protected', 'private']],
+        'single_line_empty_body' => true,
     ])
     ->setFinder($finder);

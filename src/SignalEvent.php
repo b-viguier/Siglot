@@ -31,6 +31,5 @@ final class SignalEvent
         public readonly object $object,
         public readonly string $method,
         public readonly array $args,
-    ) {
-    }
+    ) {}
 }
