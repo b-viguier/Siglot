@@ -17,7 +17,8 @@ RUN chmod +x /usr/local/bin/phpstan
 RUN apt-get update && apt-get install -y \
 		libzip-dev \
         zip
-
 RUN docker-php-ext-install zip
+
+RUN pecl install xdebug && docker-php-ext-enable xdebug
 
 WORKDIR /app
