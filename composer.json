@@ -10,9 +10,39 @@
             "Bviguier\\Siglot\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Bviguier\\Siglot\\Tests\\Unit\\": "tests/unit/"
+        }
+    },
     "authors": [
         {
             "name": "Benoit Viguier"
         }
-    ]
+    ],
+    "scripts-descriptions": {
+        "siglot:phpstan": "Run PhpStan static analysis",
+        "siglot:phpunit": "Run PhpUnit unit tests",
+        "siglot:cs-fixer": "Run PhpCsFixer to check code style",
+        "siglot:cs-fixer:fix": "Run PhpCsFixer to fix code style",
+        "siglot:local-ci": "Run all steps of the local CI process"
+    },
+    "scripts": {
+        "siglot:phpstan": "phpstan analyse --memory-limit 1G",
+        "siglot:phpunit": "phpunit",
+        "siglot:cs-fixer": "php-cs-fixer check",
+        "siglot:cs-fixer:fix": "php-cs-fixer fix",
+        "siglot:local-ci": [
+            "@siglot:phpstan",
+            "@siglot:phpunit",
+            "@siglot:cs-fixer"
+        ]
+    },
+    "scripts-aliases": {
+        "siglot:phpstan": ["phpstan"],
+        "siglot:phpunit": ["phpunit"],
+        "siglot:cs-fixer": ["cs-fixer"],
+        "siglot:cs-fixer:fix": ["cs-fixer:fix"],
+        "siglot:local-ci": ["local-ci"]
+    }
 }
