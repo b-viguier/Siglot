@@ -64,6 +64,25 @@ class SlotCollectionTest extends TestCase
         self::assertCount(1, $object->calls);
     }
 
+    public function testSlotCanBeRemovedFromAnOtherMethodInstance(): void
+    {
+        $object = new class () {
+            public int $nbCalls = 0;
+            public function mySlot(): void
+            {
+                ++$this->nbCalls;
+            }
+        };
+
+        $slot1 = SlotMethod::fromClosure($object->mySlot(...));
+        $slot2 = SlotMethod::fromClosure($object->mySlot(...));
+        $collection = new SlotCollection();
+
+        $collection->add($slot1);
+        $collection->remove($slot2);
+        self::assertSame(0, $object->nbCalls);
+    }
+
     public function testSlotsAddedTwiceAreInvokedOnce(): void
     {
         $object = new class () {
