@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Bviguier\Siglot\Tests\Unit\Internal;
 
+use Bviguier\Siglot\Emitter;
+use Bviguier\Siglot\Internal\SignalMethod;
 use Bviguier\Siglot\Internal\SlotMethod;
 use Bviguier\Siglot\SiglotError;
+use Bviguier\Siglot\SignalEvent;
 use PHPUnit\Framework\TestCase;
 
 class SlotMethodTest extends TestCase
@@ -90,5 +93,31 @@ class SlotMethodTest extends TestCase
         $this->expectExceptionMessage('Attempt to create a Slot from unknown method');
 
         SlotMethod::fromClosure(fn() => null);
+    }
+
+    public function testFromWrappedSignal(): void
+    {
+        $object = new class () implements Emitter {
+            public function mySignal(int $int, string $string): SignalEvent
+            {
+                return SignalEvent::auto();
+            }
+        };
+
+        $signalMethod = SignalMethod::fromClosure($object->mySignal(...));
+        $slotMethod = SlotMethod::fromWrappedSignal($signalMethod, fn($args) => ['args' => $args]);
+
+        self::assertTrue($slotMethod->isValid());
+        self::assertSame($object, $slotMethod->object());
+        self::assertSame('mySignal', $slotMethod->name);
+
+        $result = $slotMethod->invoke([1, 'string']);
+
+        self::assertSame(['args' => [1, 'string']], $result);
+
+        unset($object);
+        \gc_collect_cycles();
+
+        self::assertFalse($slotMethod->isValid());
     }
 }

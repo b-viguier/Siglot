@@ -29,6 +29,15 @@ class SlotMethod
         );
     }
 
+    public static function fromWrappedSignal(SignalMethod $signalMethod, \Closure $wrapper): self
+    {
+        return new self(
+            $signalMethod->name,
+            $signalMethod->object(),
+            fn() => $wrapper($signalMethod->invoke(\func_get_args())->args),
+        );
+    }
+
     public function object(): object
     {
         \assert($this->object->get() !== null);
