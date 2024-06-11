@@ -26,6 +26,19 @@ class SlotMethodTest extends TestCase
         self::assertSame('mySlot', $slotMethod->name);
     }
 
+    public function testCaseInsensitivity(): void
+    {
+        $object = new class () {
+            public function mySlot(): void {}
+        };
+
+        $slotMethod = SlotMethod::fromClosure($object->MYSLOT(...));
+
+        self::assertTrue($slotMethod->isValid());
+        self::assertSame($object, $slotMethod->object());
+        self::assertSame('mySlot', $slotMethod->name);
+    }
+
     public function testItDoesNotPreventGarbageCollection(): void
     {
         $object = new class () {

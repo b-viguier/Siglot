@@ -29,6 +29,22 @@ class SignalMethodTest extends TestCase
         self::assertSame('mySignal', $signalMethod->name);
     }
 
+    public function testCaseInsensitivity(): void
+    {
+        $object = new class () implements Emitter {
+            public function mySignal(): SignalEvent
+            {
+                return SignalEvent::auto();
+            }
+        };
+
+        $signalMethod = SignalMethod::fromClosure($object->MYSIGNAL(...));
+
+        self::assertTrue($signalMethod->isValid());
+        self::assertSame($object, $signalMethod->object());
+        self::assertSame('mySignal', $signalMethod->name);
+    }
+
     public function testItDoesNotPreventGarbageCollection(): void
     {
         $object = new class () implements Emitter {
