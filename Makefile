@@ -40,3 +40,4 @@ local-ci: ## Run the Composer "local-ci" script in every containers
 help: ## Display this help
 	@grep -hE '(^[a-zA-Z_0-9.-]+:.*?##.*$$)|(^###)' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m##/[33m\n/'
 .PHONY: help
+.DEFAULT_GOAL := help
