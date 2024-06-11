@@ -8,7 +8,7 @@ use Bviguier\Siglot\Emitter;
 use Bviguier\Siglot\SiglotError;
 use Bviguier\Siglot\SignalEvent;
 
-class SignalMethod
+final class SignalMethod
 {
     public static function fromClosure(\Closure $closure): self
     {

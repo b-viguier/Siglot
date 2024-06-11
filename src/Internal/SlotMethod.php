@@ -6,7 +6,7 @@ namespace Bviguier\Siglot\Internal;
 
 use Bviguier\Siglot\SiglotError;
 
-class SlotMethod
+final class SlotMethod
 {
     public static function fromClosure(\Closure $closure): self
     {

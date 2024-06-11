@@ -6,7 +6,7 @@ namespace Bviguier\Siglot\Internal;
 
 use Bviguier\Siglot\SiglotError;
 
-class SlotCollection
+final class SlotCollection
 {
     public function __construct()
     {
