@@ -60,7 +60,7 @@ final class SignalMethod
         return $event;
     }
 
-    public function emitter(): object
+    public function emitter(): Emitter
     {
         \assert($this->emitter->get() !== null);
 
@@ -73,7 +73,7 @@ final class SignalMethod
     }
 
 
-    /** @var \WeakReference<object> */
+    /** @var \WeakReference<Emitter> */
     private \WeakReference $emitter;
 
     /**
@@ -81,7 +81,7 @@ final class SignalMethod
      */
     private function __construct(
         public readonly string $name,
-        object $emitter,
+        Emitter $emitter,
         private readonly \Closure $function,
     ) {
         \assert((new \ReflectionFunction($function))->getClosureThis() === null);
