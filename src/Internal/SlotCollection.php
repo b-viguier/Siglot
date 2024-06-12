@@ -16,7 +16,7 @@ final class SlotCollection
     public function add(SlotMethod $slotMethod): void
     {
         \assert($slotMethod->isValid());
-        $slotInstance = $this->slotInstances[$slotMethod->object()] ?? $this->slotInstances[$slotMethod->object()] = new \ArrayObject();
+        $slotInstance = $this->slotInstances[$slotMethod->receiver()] ?? $this->slotInstances[$slotMethod->receiver()] = new \ArrayObject();
 
         $slotInstance[$slotMethod->name] = $slotMethod;
     }
@@ -24,11 +24,11 @@ final class SlotCollection
     public function remove(SlotMethod $slotMethod): void
     {
         \assert($slotMethod->isValid());
-        if (!isset($this->slotInstances[$slotMethod->object()])) {
+        if (!isset($this->slotInstances[$slotMethod->receiver()])) {
             throw new SiglotError('Slot not found in collection');
         }
 
-        unset($this->slotInstances[$slotMethod->object()][$slotMethod->name]);
+        unset($this->slotInstances[$slotMethod->receiver()][$slotMethod->name]);
     }
 
     /**

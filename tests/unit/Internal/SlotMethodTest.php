@@ -22,7 +22,7 @@ class SlotMethodTest extends TestCase
         $slotMethod = SlotMethod::fromClosure($receiver->mySlot(...));
 
         self::assertTrue($slotMethod->isValid());
-        self::assertSame($receiver, $slotMethod->object());
+        self::assertSame($receiver, $slotMethod->receiver());
         self::assertSame('mySlot', $slotMethod->name);
     }
 
@@ -33,7 +33,7 @@ class SlotMethodTest extends TestCase
         $slotMethod = SlotMethod::fromClosure($receiver->MYSLOT(...));
 
         self::assertTrue($slotMethod->isValid());
-        self::assertSame($receiver, $slotMethod->object());
+        self::assertSame($receiver, $slotMethod->receiver());
         self::assertSame('mySlot', $slotMethod->name);
     }
 
@@ -83,7 +83,7 @@ class SlotMethodTest extends TestCase
         $slotMethod = $receiver->getSlotMethod();
 
         self::assertTrue($slotMethod->isValid());
-        self::assertSame($receiver, $slotMethod->object());
+        self::assertSame($receiver, $slotMethod->receiver());
         self::assertSame('myPrivateSlot', $slotMethod->name);
         self::assertSame('private', $slotMethod->invoke([]));
     }
@@ -118,7 +118,7 @@ class SlotMethodTest extends TestCase
         $slotMethod = SlotMethod::fromWrappedSignal($signalMethod, fn($args) => ['args' => $args]);
 
         self::assertTrue($slotMethod->isValid());
-        self::assertSame($object, $slotMethod->object());
+        self::assertSame($object, $slotMethod->receiver());
         self::assertSame('mySignal', $slotMethod->name);
 
         $result = $slotMethod->invoke([1, 'string']);

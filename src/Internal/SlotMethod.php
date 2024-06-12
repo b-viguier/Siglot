@@ -11,20 +11,20 @@ final class SlotMethod
     public static function fromClosure(\Closure $closure): self
     {
         $reflection = new \ReflectionFunction($closure);
-        $object = $reflection->getClosureThis();
+        $receiver = $reflection->getClosureThis();
 
-        if ($object === null) {
+        if ($receiver === null) {
             throw new SiglotError("Closure is not bound to an object");
         }
 
         $methodName = $reflection->getName();
-        if (!(new \ReflectionClass($object))->hasMethod($methodName)) {
+        if (!(new \ReflectionClass($receiver))->hasMethod($methodName)) {
             throw new SiglotError("Attempt to create a Slot from unknown method");
         }
 
         return new self(
             $methodName,
-            $object,
+            $receiver,
             fn() => $this->$methodName(...\func_get_args()),    // @phpstan-ignore-line
         );
     }
@@ -38,16 +38,16 @@ final class SlotMethod
         );
     }
 
-    public function object(): object
+    public function receiver(): object
     {
-        \assert($this->object->get() !== null);
+        \assert($this->receiver->get() !== null);
 
-        return $this->object->get();
+        return $this->receiver->get();
     }
 
     public function isValid(): bool
     {
-        return $this->object->get() !== null;
+        return $this->receiver->get() !== null;
     }
 
     /**
@@ -55,7 +55,7 @@ final class SlotMethod
      */
     public function invoke(array $args): mixed
     {
-        $instance = $this->object();
+        $instance = $this->receiver();
 
         return \call_user_func_array(
             $this->function->bindTo($instance, $instance::class),
@@ -64,17 +64,17 @@ final class SlotMethod
     }
 
     /** @var \WeakReference<object> */
-    private \WeakReference $object;
+    private \WeakReference $receiver;
 
     /**
      * @param \Closure(mixed ...$params):mixed $function
      */
     private function __construct(
         public readonly string $name,
-        object $object,
+        object $receiver,
         private readonly \Closure $function,
     ) {
-        $this->object = \WeakReference::create($object);
+        $this->receiver = \WeakReference::create($receiver);
 
         $reflection = new \ReflectionFunction($function);
 
