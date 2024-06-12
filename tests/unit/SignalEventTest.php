@@ -12,7 +12,7 @@ class SignalEventTest extends TestCase
 {
     public function testAutoCreation(): void
     {
-        $object = new class () {
+        $emitter = new class () {
             /** @param mixed[] $array */
             public function myMethod(int $int, string $string, array $array, object $obj): SignalEvent
             {
@@ -22,22 +22,22 @@ class SignalEventTest extends TestCase
         $args  = [1, 'string', ['array'], new \stdClass()];
         $method = 'myMethod';
 
-        $event = $object->$method(...$args);
+        $event = $emitter->$method(...$args);
 
-        self::assertSame($object, $event->object);
+        self::assertSame($emitter, $event->emitter);
         self::assertSame($method, $event->method);
         self::assertSame($args, $event->args);
 
         // Case insensitivity
-        $event = $object->MYMETHOD(...$args);
-        self::assertSame($object, $event->object);
+        $event = $emitter->MYMETHOD(...$args);
+        self::assertSame($emitter, $event->emitter);
         self::assertSame($method, $event->method);
         self::assertSame($args, $event->args);
     }
 
     public function testAutoCreationDoesNotHandleReferences(): void
     {
-        $object = new class () {
+        $emitter = new class () {
             public function myMethod(int &$int): SignalEvent
             {
                 return SignalEvent::auto();
@@ -45,7 +45,7 @@ class SignalEventTest extends TestCase
         };
         $int = 1;
 
-        $event = $object->myMethod($int);
+        $event = $emitter->myMethod($int);
         $int = 2;
 
         self::assertSame(1, $event->args[0]);
@@ -53,7 +53,7 @@ class SignalEventTest extends TestCase
 
     public function testAutoCreationFromStaticFunctionThrowsAnError(): void
     {
-        $object = new class () {
+        $emitter = new class () {
             public static function myMethod(): SignalEvent
             {
                 return SignalEvent::auto();
@@ -62,7 +62,7 @@ class SignalEventTest extends TestCase
 
         self::expectException(SiglotError::class);
         self::expectExceptionMessage("Attempt to create signal outside of a method");
-        $object::myMethod();
+        $emitter::myMethod();
     }
 
     public function testAutoCreationFromAnonymousClosureThrowsAnError(): void
@@ -74,38 +74,38 @@ class SignalEventTest extends TestCase
 
     public function testAutoCreationFromFirstClassCallableSyntaxIsHandled(): void
     {
-        $object = new class () {
+        $emitter = new class () {
             public function myMethod(int $int): SignalEvent
             {
                 return SignalEvent::auto();
             }
         };
 
-        $closure = $object->myMethod(...);
+        $closure = $emitter->myMethod(...);
         $event = $closure(1);
 
-        self::assertSame($object, $event->object);
+        self::assertSame($emitter, $event->emitter);
         self::assertSame('myMethod', $event->method);
         self::assertSame([1], $event->args);
     }
 
     public function testDefaultValuesAreNotHandled(): void
     {
-        $object = new class () {
+        $emitter = new class () {
             /** @param mixed[] $array */
             public function myMethod(int $int = 1, string $string = 'string', array $array = ['array'], object $obj = null): SignalEvent
             {
                 return SignalEvent::auto();
             }
         };
-        $event = $object->myMethod();
+        $event = $emitter->myMethod();
 
         self::assertSame([], $event->args);
     }
 
     public function testArgsArePositional(): void
     {
-        $object = new class () {
+        $emitter = new class () {
             public function myMethod(int $int, string $string, object $obj): SignalEvent
             {
                 return SignalEvent::auto();
@@ -116,7 +116,7 @@ class SignalEventTest extends TestCase
             'string' => 'other',
             'obj' => new \stdClass(),
         ];
-        $event = $object->myMethod(
+        $event = $emitter->myMethod(
             string: $args['string'],
             int: $args['int'],
             obj: $args['obj'],
@@ -127,35 +127,35 @@ class SignalEventTest extends TestCase
 
     public function testVariadicArgumentsAreHandled(): void
     {
-        $object = new class () {
+        $emitter = new class () {
             public function myMethod(string $string, int ...$variadic): SignalEvent
             {
                 return SignalEvent::auto();
             }
         };
         $args = ['string', 1, 2, 3, 4, 5];
-        $event = $object->myMethod(... $args);
+        $event = $emitter->myMethod(... $args);
 
         self::assertSame($args, $event->args);
     }
 
     public function testExtraArgumentsAreHandled(): void
     {
-        $object = new class () {
+        $emitter = new class () {
             public function myMethod(int $int, string $string): SignalEvent
             {
                 return SignalEvent::auto();
             }
         };
         $args = [1, 'string', 'extra'];
-        $event = $object->myMethod(...$args); // @phpstan-ignore-line
+        $event = $emitter->myMethod(...$args); // @phpstan-ignore-line
 
         self::assertSame($args, $event->args);
     }
 
     public function testAutoCreationFromPrivateMethod(): void
     {
-        $object = new class () {
+        $emitter = new class () {
             private function myMethod(int ...$args): SignalEvent
             {
                 return SignalEvent::auto();
@@ -168,9 +168,9 @@ class SignalEventTest extends TestCase
         };
 
         $args = [1, 2, 3];
-        $event = $object->callMyMethod(...$args);
+        $event = $emitter->callMyMethod(...$args);
 
-        self::assertSame($object, $event->object);
+        self::assertSame($emitter, $event->emitter);
         self::assertSame('myMethod', $event->method);
         self::assertSame($args, $event->args);
     }

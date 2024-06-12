@@ -28,7 +28,7 @@ final class SignalEvent
      * @param array<mixed> $args
      */
     private function __construct(
-        public readonly object $object,
+        public readonly object $emitter,
         public readonly string $method,
         public readonly array $args,
     ) {}

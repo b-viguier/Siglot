@@ -53,7 +53,7 @@ class SignalMethodTest extends TestCase
 
     public function testInvocation(): void
     {
-        $object = new class () implements Emitter {
+        $emitter = new class () implements Emitter {
             use FakeEmitterTrait;
             public function mySignal(int $int, string $string): SignalEvent
             {
@@ -61,17 +61,17 @@ class SignalMethodTest extends TestCase
             }
         };
 
-        $signalMethod = SignalMethod::fromClosure($object->mySignal(...));
+        $signalMethod = SignalMethod::fromClosure($emitter->mySignal(...));
         $event = $signalMethod->invoke([1, 'string']);
 
-        self::assertSame($object, $event->object);
+        self::assertSame($emitter, $event->emitter);
         self::assertSame('mySignal', $event->method);
         self::assertSame([1, 'string'], $event->args);
     }
 
     public function testCreationFromPrivateMethod(): void
     {
-        $object = new class () implements Emitter {
+        $emitter = new class () implements Emitter {
             use FakeEmitterTrait;
             private function myPrivateSignal(string $string): SignalEvent
             {
@@ -84,10 +84,10 @@ class SignalMethodTest extends TestCase
             }
         };
 
-        $signalMethod = $object->getSignalMethod();
+        $signalMethod = $emitter->getSignalMethod();
         $event = $signalMethod->invoke(['string']);
 
-        self::assertSame($object, $event->object);
+        self::assertSame($emitter, $event->emitter);
         self::assertSame('myPrivateSignal', $event->method);
         self::assertSame(['string'], $event->args);
     }
@@ -125,12 +125,12 @@ class SignalMethodTest extends TestCase
     }
 
     #[DataProvider('invalidSignalMethodProvider')]
-    public function testExceptionThrownWhenClosureDoesNotReturnsSignalEventObject(object $object): void
+    public function testExceptionThrownWhenClosureDoesNotReturnsSignalEventObject(Emitter $emitter): void
     {
         self::expectException(SiglotError::class);
         self::expectExceptionMessage('Closure does not return a SignalEvent object');
 
-        SignalMethod::fromClosure($object->mySignal(...)); // @phpstan-ignore-line
+        SignalMethod::fromClosure($emitter->mySignal(...)); // @phpstan-ignore-line
     }
 
     /**
