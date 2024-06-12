@@ -22,7 +22,7 @@ class SignalMethodTest extends TestCase
         $signalMethod = SignalMethod::fromClosure($emitter->mySignal(...));
 
         self::assertTrue($signalMethod->isValid());
-        self::assertSame($emitter, $signalMethod->object());
+        self::assertSame($emitter, $signalMethod->emitter());
         self::assertSame('mySignal', $signalMethod->name);
     }
 
@@ -33,7 +33,7 @@ class SignalMethodTest extends TestCase
         $signalMethod = SignalMethod::fromClosure($emitter->MYSIGNAL(...));
 
         self::assertTrue($signalMethod->isValid());
-        self::assertSame($emitter, $signalMethod->object());
+        self::assertSame($emitter, $signalMethod->emitter());
         self::assertSame('mySignal', $signalMethod->name);
     }
 

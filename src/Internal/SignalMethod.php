@@ -13,21 +13,21 @@ final class SignalMethod
     public static function fromClosure(\Closure $closure): self
     {
         $reflection = new \ReflectionFunction($closure);
-        $object = $reflection->getClosureThis();
+        $emitter = $reflection->getClosureThis();
 
-        if ($object === null) {
+        if ($emitter === null) {
             throw new SiglotError("Closure is not bound to an object");
         }
-        if (!$object instanceof Emitter) {
+        if (!$emitter instanceof Emitter) {
             throw new SiglotError("Closure is not bound to an Emitter object");
         }
 
         $methodName = $reflection->getName();
-        if (!(new \ReflectionClass($object))->hasMethod($methodName)) {
+        if (!(new \ReflectionClass($emitter))->hasMethod($methodName)) {
             throw new SiglotError("Attempt to create a Signal from unknown method");
         }
 
-        $returnType = (new \ReflectionMethod($object, $methodName))->getReturnType();
+        $returnType = (new \ReflectionMethod($emitter, $methodName))->getReturnType();
         if (
             !($returnType  instanceof \ReflectionNamedType)
             || $returnType->getName() !== SignalEvent::class
@@ -38,7 +38,7 @@ final class SignalMethod
 
         return new self(
             $methodName,
-            $object,
+            $emitter,
             fn() => $this->$methodName(...\func_get_args()), // @phpstan-ignore-line
         );
     }
@@ -49,7 +49,7 @@ final class SignalMethod
      */
     public function invoke(array $args): SignalEvent
     {
-        $instance = $this->object();
+        $instance = $this->emitter();
 
         $event = \call_user_func_array(
             $this->function->bindTo($instance, $instance::class),
@@ -60,32 +60,32 @@ final class SignalMethod
         return $event;
     }
 
-    public function object(): object
+    public function emitter(): object
     {
-        \assert($this->object->get() !== null);
+        \assert($this->emitter->get() !== null);
 
-        return $this->object->get();
+        return $this->emitter->get();
     }
 
     public function isValid(): bool
     {
-        return $this->object->get() !== null;
+        return $this->emitter->get() !== null;
     }
 
 
     /** @var \WeakReference<object> */
-    private \WeakReference $object;
+    private \WeakReference $emitter;
 
     /**
      * @param \Closure(mixed ...$params):SignalEvent $function
      */
     private function __construct(
         public readonly string $name,
-        object $object,
+        object $emitter,
         private readonly \Closure $function,
     ) {
         \assert((new \ReflectionFunction($function))->getClosureThis() === null);
 
-        $this->object = \WeakReference::create($object);
+        $this->emitter = \WeakReference::create($emitter);
     }
 }

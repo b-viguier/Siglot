@@ -33,7 +33,7 @@ final class SlotMethod
     {
         return new self(
             $signalMethod->name,
-            $signalMethod->object(),
+            $signalMethod->emitter(),
             fn() => $wrapper($signalMethod->invoke(\func_get_args())->args),
         );
     }
