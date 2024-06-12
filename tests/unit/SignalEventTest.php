@@ -27,6 +27,12 @@ class SignalEventTest extends TestCase
         self::assertSame($object, $event->object);
         self::assertSame($method, $event->method);
         self::assertSame($args, $event->args);
+
+        // Case insensitivity
+        $event = $object->MYMETHOD(...$args);
+        self::assertSame($object, $event->object);
+        self::assertSame($method, $event->method);
+        self::assertSame($args, $event->args);
     }
 
     public function testAutoCreationDoesNotHandleReferences(): void
