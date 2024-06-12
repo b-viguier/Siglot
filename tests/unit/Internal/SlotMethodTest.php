@@ -10,47 +10,42 @@ use Bviguier\Siglot\Internal\SlotMethod;
 use Bviguier\Siglot\SiglotError;
 use Bviguier\Siglot\SignalEvent;
 use Bviguier\Siglot\Tests\Support\FakeEmitterTrait;
+use Bviguier\Siglot\Tests\Support\SpyReceiver;
 use PHPUnit\Framework\TestCase;
 
 class SlotMethodTest extends TestCase
 {
     public function testSlotMethodCreation(): void
     {
-        $object = new class () {
-            public function mySlot(): void {}
-        };
+        $receiver = new SpyReceiver();
 
-        $slotMethod = SlotMethod::fromClosure($object->mySlot(...));
+        $slotMethod = SlotMethod::fromClosure($receiver->mySlot(...));
 
         self::assertTrue($slotMethod->isValid());
-        self::assertSame($object, $slotMethod->object());
+        self::assertSame($receiver, $slotMethod->object());
         self::assertSame('mySlot', $slotMethod->name);
     }
 
     public function testCaseInsensitivity(): void
     {
-        $object = new class () {
-            public function mySlot(): void {}
-        };
+        $receiver = new SpyReceiver();
 
-        $slotMethod = SlotMethod::fromClosure($object->MYSLOT(...));
+        $slotMethod = SlotMethod::fromClosure($receiver->MYSLOT(...));
 
         self::assertTrue($slotMethod->isValid());
-        self::assertSame($object, $slotMethod->object());
+        self::assertSame($receiver, $slotMethod->object());
         self::assertSame('mySlot', $slotMethod->name);
     }
 
     public function testItDoesNotPreventGarbageCollection(): void
     {
-        $object = new class () {
-            public function mySlot(): void {}
-        };
+        $receiver = new SpyReceiver();
 
-        $slotMethod = SlotMethod::fromClosure($object->mySlot(...));
+        $slotMethod = SlotMethod::fromClosure($receiver->mySlot(...));
 
         self::assertTrue($slotMethod->isValid());
 
-        unset($object);
+        unset($receiver);
         \gc_collect_cycles();
 
         self::assertFalse($slotMethod->isValid());
@@ -58,7 +53,7 @@ class SlotMethodTest extends TestCase
 
     public function testInvocation(): void
     {
-        $object = new class () {
+        $receiver = new class () {
             /** @return array{0:int,1:string} */
             public function mySlot(int $int, string $string): array
             {
@@ -66,14 +61,14 @@ class SlotMethodTest extends TestCase
             }
         };
 
-        $slotMethod = SlotMethod::fromClosure($object->mySlot(...));
+        $slotMethod = SlotMethod::fromClosure($receiver->mySlot(...));
 
         self::assertSame([1, 'string'], $slotMethod->invoke([1, 'string']));
     }
 
     public function testCreationFromPrivateMethod(): void
     {
-        $object = new class () {
+        $receiver = new class () {
             private function myPrivateSlot(): string
             {
                 return 'private';
@@ -85,10 +80,10 @@ class SlotMethodTest extends TestCase
             }
         };
 
-        $slotMethod = $object->getSlotMethod();
+        $slotMethod = $receiver->getSlotMethod();
 
         self::assertTrue($slotMethod->isValid());
-        self::assertSame($object, $slotMethod->object());
+        self::assertSame($receiver, $slotMethod->object());
         self::assertSame('myPrivateSlot', $slotMethod->name);
         self::assertSame('private', $slotMethod->invoke([]));
     }

@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Bviguier\Siglot\Tests\Unit\Internal;
 
-use Bviguier\Siglot\Emitter;
 use Bviguier\Siglot\Internal\Connector;
 use Bviguier\Siglot\Internal\SignalMethod;
 use Bviguier\Siglot\Internal\SlotCollection;
 use Bviguier\Siglot\Internal\SlotMethod;
-use Bviguier\Siglot\SignalEvent;
-use Bviguier\Siglot\Tests\Support\FakeEmitterTrait;
+use Bviguier\Siglot\Tests\Support\SpyReceiver;
+use Bviguier\Siglot\Tests\Support\TestEmitter;
 use PHPUnit\Framework\TestCase;
 
 class ConnectorTest extends TestCase
@@ -18,23 +17,11 @@ class ConnectorTest extends TestCase
     public function testConnectedSlotIsAddedToCollection(): void
     {
         $signal = SignalMethod::fromClosure(
-            (new class () implements Emitter {
-                use FakeEmitterTrait;
-                public function mySignal(): SignalEvent
-                {
-                    return SignalEvent::auto();
-                }
-            })->mySignal(...)
+            (new TestEmitter())->mySignal(...)
         );
         $collection = new SlotCollection();
         $slot = SlotMethod::fromClosure(
-            ($object = new class () {
-                public int $nbCalls = 0;
-                public function mySlot(): void
-                {
-                    ++$this->nbCalls;
-                }
-            })->mySlot(...),
+            ($receiver = new SpyReceiver())->mySlot(...),
         );
 
         $connector = new Connector($signal, $collection);
@@ -42,29 +29,17 @@ class ConnectorTest extends TestCase
         $connector->connect($slot);
         $collection->invoke([]);
 
-        self::assertSame(1, $object->nbCalls);
+        self::assertSame(1, $receiver->nbCalls());
     }
 
     public function testDisconnectSlotIsRemovedFromCollection(): void
     {
         $signal = SignalMethod::fromClosure(
-            (new class () implements Emitter {
-                use FakeEmitterTrait;
-                public function mySignal(): SignalEvent
-                {
-                    return SignalEvent::auto();
-                }
-            })->mySignal(...)
+            (new TestEmitter())->mySignal(...)
         );
         $collection = new SlotCollection();
         $slot = SlotMethod::fromClosure(
-            ($object = new class () {
-                public int $nbCalls = 0;
-                public function mySlot(): void
-                {
-                    ++$this->nbCalls;
-                }
-            })->mySlot(...),
+            ($receiver = new SpyReceiver())->mySlot(...),
         );
 
         $connector = new Connector($signal, $collection);
@@ -73,52 +48,34 @@ class ConnectorTest extends TestCase
         $connector->disconnect($slot);
         $collection->invoke([]);
 
-        self::assertSame(0, $object->nbCalls);
+        self::assertSame(0, $receiver->nbCalls());
     }
 
     public function testConnectorsChainingAndUnchaining(): void
     {
         $signalSrc = SignalMethod::fromClosure(
-            (new class () implements Emitter {
-                use FakeEmitterTrait;
-                public function mySignal(): SignalEvent
-                {
-                    return SignalEvent::auto();
-                }
-            })->mySignal(...)
+            (new TestEmitter())->mySignal(...)
         );
         $collectionSrc = new SlotCollection();
         $connectorSrc = new Connector($signalSrc, $collectionSrc);
 
         $signalDst = SignalMethod::fromClosure(
-            ($signalObject = new class () implements Emitter {
-                use FakeEmitterTrait;
-                public function mySignal(): SignalEvent
-                {
-                    return SignalEvent::auto();
-                }
-            })->mySignal(...)
+            ($emitterDst = new TestEmitter())->mySignal(...)
         );
         $collectionDst = new SlotCollection();
         $collectionDst->add(SlotMethod::fromClosure(
-            ($object = new class () {
-                public int $nbCalls = 0;
-                public function mySlot(): void
-                {
-                    ++$this->nbCalls;
-                }
-            })->mySlot(...),
+            ($receiver = new SpyReceiver())->mySlot(...),
         ));
         $connectorDst = new Connector($signalDst, $collectionDst);
 
         $connectorSrc->chain($connectorDst);
         $collectionSrc->invoke([]);
 
-        self::assertSame(1, $object->nbCalls);
+        self::assertSame(1, $receiver->nbCalls());
 
         $connectorSrc->unchain($connectorDst);
         $collectionSrc->invoke([]);
 
-        self::assertSame(1, $object->nbCalls);
+        self::assertSame(1, $receiver->nbCalls());
     }
 }

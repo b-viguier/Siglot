@@ -7,95 +7,69 @@ namespace Bviguier\Siglot\Tests\Unit\Internal;
 use Bviguier\Siglot\Internal\SlotCollection;
 use Bviguier\Siglot\Internal\SlotMethod;
 use Bviguier\Siglot\SiglotError;
+use Bviguier\Siglot\Tests\Support\SpyReceiver;
 use PHPUnit\Framework\TestCase;
 
 class SlotCollectionTest extends TestCase
 {
     public function testAddedSlotsAreInvoked(): void
     {
-        $object1 = new class () {
-            /** @var array<mixed[]> */
-            public array $calls = [];
-            public function mySlot(int $int, string $string): void
-            {
-                $this->calls[] = \func_get_args();
-            }
-        };
-        $object2 = new $object1();
+        $receiver1 = new SpyReceiver();
+        $receiver2 = new SpyReceiver();
 
-        $slot1 = SlotMethod::fromClosure($object1->mySlot(...));
-        $slot2 = SlotMethod::fromClosure($object2->mySlot(...));
+        $slot1 = SlotMethod::fromClosure($receiver1->mySlot(...));
+        $slot2 = SlotMethod::fromClosure($receiver2->mySlot(...));
         $collection = new SlotCollection();
         $args = [1, 'string'];
 
         $collection->invoke($args);
-        self::assertCount(0, $object1->calls);
-        self::assertCount(0, $object2->calls);
+        self::assertSame(0, $receiver1->nbCalls());
+        self::assertSame(0, $receiver2->nbCalls());
 
         $collection->add($slot1);
         $collection->add($slot2);
         $collection->invoke($args);
 
-        self::assertSame([$args], $object1->calls);
-        self::assertSame([$args], $object2->calls);
+        self::assertSame([$args], $receiver1->calls());
+        self::assertSame([$args], $receiver2->calls());
     }
 
     public function testRemovedSlotsAreNotInvokedAnymore(): void
     {
-        $object = new class () {
-            /** @var array<mixed[]> */
-            public array $calls = [];
-            public function mySlot(int $int, string $string): void
-            {
-                $this->calls[] = \func_get_args();
-            }
-        };
+        $receiver = new SpyReceiver();
 
-        $slot = SlotMethod::fromClosure($object->mySlot(...));
+        $slot = SlotMethod::fromClosure($receiver->mySlot(...));
         $collection = new SlotCollection();
         $args = [1, 'string'];
 
         $collection->add($slot);
         $collection->invoke($args);
-        self::assertCount(1, $object->calls);
+        self::assertSame(1, $receiver->nbCalls());
 
         $collection->remove($slot);
         $collection->invoke($args);
-        self::assertCount(1, $object->calls);
+        self::assertSame(1, $receiver->nbCalls());
     }
 
     public function testSlotCanBeRemovedFromAnOtherMethodInstance(): void
     {
-        $object = new class () {
-            public int $nbCalls = 0;
-            public function mySlot(): void
-            {
-                ++$this->nbCalls;
-            }
-        };
+        $receiver = new SpyReceiver();
 
-        $slot1 = SlotMethod::fromClosure($object->mySlot(...));
-        $slot2 = SlotMethod::fromClosure($object->mySlot(...));
+        $slot1 = SlotMethod::fromClosure($receiver->mySlot(...));
+        $slot2 = SlotMethod::fromClosure($receiver->mySlot(...));
         $collection = new SlotCollection();
 
         $collection->add($slot1);
         $collection->remove($slot2);
-        self::assertSame(0, $object->nbCalls);
+        self::assertSame(0, $receiver->nbCalls());
     }
 
     public function testSlotsAddedTwiceAreInvokedOnce(): void
     {
-        $object = new class () {
-            /** @var array<mixed[]> */
-            public array $calls = [];
-            public function mySlot(int $int, string $string): void
-            {
-                $this->calls[] = \func_get_args();
-            }
-        };
+        $receiver = new SpyReceiver();
 
-        $slot1 = SlotMethod::fromClosure($object->mySlot(...));
-        $slot2 = SlotMethod::fromClosure($object->mySlot(...));
+        $slot1 = SlotMethod::fromClosure($receiver->mySlot(...));
+        $slot2 = SlotMethod::fromClosure($receiver->mySlot(...));
         $collection = new SlotCollection();
         $args = [1, 'string'];
 
@@ -103,16 +77,14 @@ class SlotCollectionTest extends TestCase
         $collection->add($slot1);
         $collection->add($slot2);
         $collection->invoke($args);
-        self::assertCount(1, $object->calls);
+        self::assertSame(1, $receiver->nbCalls());
     }
 
     public function testRemovingUnknownSlotThrowsAnException(): void
     {
-        $object = new class () {
-            public function mySlot(): void {}
-        };
+        $receiver = new SpyReceiver();
 
-        $slot = SlotMethod::fromClosure($object->mySlot(...));
+        $slot = SlotMethod::fromClosure($receiver->mySlot(...));
         $collection = new SlotCollection();
 
         self::expectException(SiglotError::class);
@@ -120,9 +92,9 @@ class SlotCollectionTest extends TestCase
         $collection->remove($slot);
     }
 
-    public function testSeveralSlotsFromSameObjectsAreAllowed(): void
+    public function testSeveralSlotsFromSameReceiverAreAllowed(): void
     {
-        $object = new class () {
+        $receiver = new class () {
             /** @var array<array{0:string,1:string}> */
             public array $calls = [];
             public function mySlot1(string $string): void
@@ -135,29 +107,22 @@ class SlotCollectionTest extends TestCase
             }
         };
 
-        $slot1 = SlotMethod::fromClosure($object->mySlot1(...));
-        $slot2 = SlotMethod::fromClosure($object->mySlot2(...));
+        $slot1 = SlotMethod::fromClosure($receiver->mySlot1(...));
+        $slot2 = SlotMethod::fromClosure($receiver->mySlot2(...));
         $collection = new SlotCollection();
 
         $collection->add($slot1);
         $collection->add($slot2);
         $collection->invoke(['input']);
 
-        self::assertSame([['mySlot1', 'input'], ['mySlot2', 'input']], $object->calls);
+        self::assertSame([['mySlot1', 'input'], ['mySlot2', 'input']], $receiver->calls);
     }
 
     public function testSlotsCanBeAddedDuringInvocation(): void
     {
-        $object = new class () {
-            public int $nbCalls = 0;
+        $receiver = new SpyReceiver();
 
-            public function mySlot(): void
-            {
-                ++$this->nbCalls;
-            }
-        };
-
-        $addObject = new class () {
+        $receiverAddingSlot = new class () {
             public SlotMethod $slotToAdd;
             public int $nbCalls = 0;
 
@@ -168,34 +133,27 @@ class SlotCollectionTest extends TestCase
             }
         };
 
-        $slot = SlotMethod::fromClosure($object->mySlot(...));
-        $addSlot = SlotMethod::fromClosure($addObject->mySlot(...));
-        $addObject->slotToAdd = $slot;
+        $slot = SlotMethod::fromClosure($receiver->mySlot(...));
+        $addSlot = SlotMethod::fromClosure($receiverAddingSlot->mySlot(...));
+        $receiverAddingSlot->slotToAdd = $slot;
 
         $collection = new SlotCollection();
         $collection->add($addSlot);
 
         $collection->invoke([$collection]);
 
-        self::assertSame(1, $addObject->nbCalls);
-        self::assertSame(1, $object->nbCalls);
+        self::assertSame(1, $receiverAddingSlot->nbCalls);
+        self::assertSame(1, $receiver->nbCalls());
     }
 
     public function testSlotsCanBeRemovedDuringInvocation(): void
     {
-        $object1 = new class () {
-            public int $nbCalls = 0;
-
-            public function mySlot(): void
-            {
-                ++$this->nbCalls;
-            }
-        };
-        $object2 = new $object1();
-        $object3 = new $object1();
+        $receiver1 = new SpyReceiver();
+        $receiver2 = new SpyReceiver();
+        $receiver3 = new SpyReceiver();
 
 
-        $removePrevious = new class () {
+        $receiverRemovingPreviousSlot = new class () {
             public SlotMethod $slotToRemove;
             public int $nbCalls = 0;
 
@@ -205,19 +163,19 @@ class SlotCollectionTest extends TestCase
                 $collection->remove($this->slotToRemove);
             }
         };
-        $removeNext = new $removePrevious();
-        $removeCurrent = new $removePrevious();
+        $receiverRemoverNextSlot = new $receiverRemovingPreviousSlot();
+        $receiverRemovingCurrentSlot = new $receiverRemovingPreviousSlot();
 
-        $slot1 = SlotMethod::fromClosure($object1->mySlot(...));
-        $slot2 = SlotMethod::fromClosure($object2->mySlot(...));
-        $slot3 = SlotMethod::fromClosure($object3->mySlot(...));
+        $slot1 = SlotMethod::fromClosure($receiver1->mySlot(...));
+        $slot2 = SlotMethod::fromClosure($receiver2->mySlot(...));
+        $slot3 = SlotMethod::fromClosure($receiver3->mySlot(...));
 
-        $removeSlot1 = SlotMethod::fromClosure($removePrevious->mySlot(...));
-        $removePrevious->slotToRemove = $slot1;
-        $removeSlot3 = SlotMethod::fromClosure($removeNext->mySlot(...));
-        $removeNext->slotToRemove = $slot3;
-        $removeItself = SlotMethod::fromClosure($removeCurrent->mySlot(...));
-        $removeCurrent->slotToRemove = $removeItself;
+        $removeSlot1 = SlotMethod::fromClosure($receiverRemovingPreviousSlot->mySlot(...));
+        $receiverRemovingPreviousSlot->slotToRemove = $slot1;
+        $removeSlot3 = SlotMethod::fromClosure($receiverRemoverNextSlot->mySlot(...));
+        $receiverRemoverNextSlot->slotToRemove = $slot3;
+        $removeItself = SlotMethod::fromClosure($receiverRemovingCurrentSlot->mySlot(...));
+        $receiverRemovingCurrentSlot->slotToRemove = $removeItself;
 
         $collection = new SlotCollection();
         $collection->add($slot1);
@@ -229,11 +187,11 @@ class SlotCollectionTest extends TestCase
 
         $collection->invoke([$collection]);
 
-        self::assertSame(1, $object1->nbCalls);
-        self::assertSame(1, $removePrevious->nbCalls);
-        self::assertSame(1, $removeCurrent->nbCalls);
-        self::assertSame(1, $removeNext->nbCalls);
-        self::assertSame(1, $object2->nbCalls);
-        self::assertSame(0, $object3->nbCalls);
+        self::assertSame(1, $receiver1->nbCalls());
+        self::assertSame(1, $receiverRemovingPreviousSlot->nbCalls);
+        self::assertSame(1, $receiverRemovingCurrentSlot->nbCalls);
+        self::assertSame(1, $receiverRemoverNextSlot->nbCalls);
+        self::assertSame(1, $receiver2->nbCalls());
+        self::assertSame(0, $receiver3->nbCalls());
     }
 }

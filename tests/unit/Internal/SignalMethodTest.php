@@ -9,6 +9,7 @@ use Bviguier\Siglot\Internal\SignalMethod;
 use Bviguier\Siglot\SiglotError;
 use Bviguier\Siglot\SignalEvent;
 use Bviguier\Siglot\Tests\Support\FakeEmitterTrait;
+use Bviguier\Siglot\Tests\Support\TestEmitter;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -16,53 +17,35 @@ class SignalMethodTest extends TestCase
 {
     public function testSignalMethodCreation(): void
     {
-        $object = new class () implements Emitter {
-            use FakeEmitterTrait;
-            public function mySignal(): SignalEvent
-            {
-                return SignalEvent::auto();
-            }
-        };
+        $emitter = new TestEmitter();
 
-        $signalMethod = SignalMethod::fromClosure($object->mySignal(...));
+        $signalMethod = SignalMethod::fromClosure($emitter->mySignal(...));
 
         self::assertTrue($signalMethod->isValid());
-        self::assertSame($object, $signalMethod->object());
+        self::assertSame($emitter, $signalMethod->object());
         self::assertSame('mySignal', $signalMethod->name);
     }
 
     public function testCaseInsensitivity(): void
     {
-        $object = new class () implements Emitter {
-            use FakeEmitterTrait;
-            public function mySignal(): SignalEvent
-            {
-                return SignalEvent::auto();
-            }
-        };
+        $emitter = new TestEmitter();
 
-        $signalMethod = SignalMethod::fromClosure($object->MYSIGNAL(...));
+        $signalMethod = SignalMethod::fromClosure($emitter->MYSIGNAL(...));
 
         self::assertTrue($signalMethod->isValid());
-        self::assertSame($object, $signalMethod->object());
+        self::assertSame($emitter, $signalMethod->object());
         self::assertSame('mySignal', $signalMethod->name);
     }
 
     public function testItDoesNotPreventGarbageCollection(): void
     {
-        $object = new class () implements Emitter {
-            use FakeEmitterTrait;
-            public function mySignal(): SignalEvent
-            {
-                return SignalEvent::auto();
-            }
-        };
+        $emitter = new TestEmitter();
 
-        $signalMethod = SignalMethod::fromClosure($object->mySignal(...));
+        $signalMethod = SignalMethod::fromClosure($emitter->mySignal(...));
 
         self::assertTrue($signalMethod->isValid());
 
-        unset($object);
+        unset($emitter);
         \gc_collect_cycles();
 
         self::assertFalse($signalMethod->isValid());

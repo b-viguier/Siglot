@@ -4,38 +4,18 @@ declare(strict_types=1);
 
 namespace Bviguier\Siglot\Tests\Unit;
 
-use Bviguier\Siglot\Emitter;
-use Bviguier\Siglot\EmitterHelper;
 use Bviguier\Siglot\Internal\SignalMethod;
 use Bviguier\Siglot\Internal\SlotMethod;
-use Bviguier\Siglot\SignalEvent;
+use Bviguier\Siglot\Tests\Support\SpyReceiver;
+use Bviguier\Siglot\Tests\Support\TestEmitter;
 use PHPUnit\Framework\TestCase;
 
 class EmitterHelperTest extends TestCase
 {
     public function testEmitterUseCase(): void
     {
-        $emitter = new class () implements Emitter {
-            use EmitterHelper;
-
-            public function mySignal(): SignalEvent
-            {
-                return SignalEvent::auto();
-            }
-
-            public function emitMySignal(): void
-            {
-                $this->emit($this->mySignal());
-            }
-        };
-
-        $receiver = new class () {
-            public int $nbCalls = 0;
-            public function mySlot(): void
-            {
-                ++$this->nbCalls;
-            }
-        };
+        $emitter = new TestEmitter();
+        $receiver = new SpyReceiver();
 
         $emitter->connector(
             SignalMethod::fromClosure($emitter->mySignal(...))
@@ -45,7 +25,7 @@ class EmitterHelperTest extends TestCase
 
         $emitter->emitMySignal();
 
-        self::assertSame(1, $receiver->nbCalls);
+        self::assertSame(1, $receiver->nbCalls());
     }
 
 }
