@@ -8,6 +8,7 @@ use Bviguier\Siglot\Emitter;
 use Bviguier\Siglot\Internal\SignalMethod;
 use Bviguier\Siglot\SiglotError;
 use Bviguier\Siglot\SignalEvent;
+use Bviguier\Siglot\Tests\Support\FakeEmitterTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -16,6 +17,7 @@ class SignalMethodTest extends TestCase
     public function testSignalMethodCreation(): void
     {
         $object = new class () implements Emitter {
+            use FakeEmitterTrait;
             public function mySignal(): SignalEvent
             {
                 return SignalEvent::auto();
@@ -32,6 +34,7 @@ class SignalMethodTest extends TestCase
     public function testCaseInsensitivity(): void
     {
         $object = new class () implements Emitter {
+            use FakeEmitterTrait;
             public function mySignal(): SignalEvent
             {
                 return SignalEvent::auto();
@@ -48,6 +51,7 @@ class SignalMethodTest extends TestCase
     public function testItDoesNotPreventGarbageCollection(): void
     {
         $object = new class () implements Emitter {
+            use FakeEmitterTrait;
             public function mySignal(): SignalEvent
             {
                 return SignalEvent::auto();
@@ -67,6 +71,7 @@ class SignalMethodTest extends TestCase
     public function testInvocation(): void
     {
         $object = new class () implements Emitter {
+            use FakeEmitterTrait;
             public function mySignal(int $int, string $string): SignalEvent
             {
                 return SignalEvent::auto();
@@ -84,6 +89,7 @@ class SignalMethodTest extends TestCase
     public function testCreationFromPrivateMethod(): void
     {
         $object = new class () implements Emitter {
+            use FakeEmitterTrait;
             private function myPrivateSignal(string $string): SignalEvent
             {
                 return SignalEvent::auto();
@@ -105,26 +111,27 @@ class SignalMethodTest extends TestCase
 
     public function testExceptionThrownWhenClosureIsNotBoundToObject(): void
     {
-        $this->expectException(SiglotError::class);
-        $this->expectExceptionMessage('Closure is not bound to an object');
+        self::expectException(SiglotError::class);
+        self::expectExceptionMessage('Closure is not bound to an object');
 
         SignalMethod::fromClosure(static fn() => null);
     }
 
     public function testExceptionThrownWhenClosureIsNotBoundToEmitterObject(): void
     {
-        $this->expectException(SiglotError::class);
-        $this->expectExceptionMessage('Closure is not bound to an Emitter object');
+        self::expectException(SiglotError::class);
+        self::expectExceptionMessage('Closure is not bound to an Emitter object');
 
         SignalMethod::fromClosure(fn() => null);
     }
 
     public function testExceptionThrownWhenMethodDoesNotExist(): void
     {
-        $this->expectException(SiglotError::class);
-        $this->expectExceptionMessage('Attempt to create a Signal from unknown method');
+        self::expectException(SiglotError::class);
+        self::expectExceptionMessage('Attempt to create a Signal from unknown method');
 
         $object = new class () implements Emitter {
+            use FakeEmitterTrait;
             public function createClosure(): \Closure
             {
                 return fn() => null;
@@ -137,8 +144,8 @@ class SignalMethodTest extends TestCase
     #[DataProvider('invalidSignalMethodProvider')]
     public function testExceptionThrownWhenClosureDoesNotReturnsSignalEventObject(object $object): void
     {
-        $this->expectException(SiglotError::class);
-        $this->expectExceptionMessage('Closure does not return a SignalEvent object');
+        self::expectException(SiglotError::class);
+        self::expectExceptionMessage('Closure does not return a SignalEvent object');
 
         SignalMethod::fromClosure($object->mySignal(...)); // @phpstan-ignore-line
     }
@@ -150,12 +157,14 @@ class SignalMethodTest extends TestCase
     {
         yield 'Closure does not return a SignalEvent object' => [
             new class () implements Emitter {
+                use FakeEmitterTrait;
                 public function mySignal(): void {}
             },
         ];
 
         yield 'Closure returns nullable type' => [
             new class () implements Emitter {
+                use FakeEmitterTrait;
                 public function mySignal(): SignalEvent|null
                 {
                     return null;
@@ -165,6 +174,7 @@ class SignalMethodTest extends TestCase
 
         yield 'Closure returns union' => [
             new class () implements Emitter {
+                use FakeEmitterTrait;
                 public function mySignal(): SignalEvent|int
                 {
                     return 2;

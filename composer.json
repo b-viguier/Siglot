@@ -12,7 +12,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Bviguier\\Siglot\\Tests\\Unit\\": "tests/unit/"
+            "Bviguier\\Siglot\\Tests\\Unit\\": "tests/unit/",
+            "Bviguier\\Siglot\\Tests\\Support\\": "tests/support/"
         }
     },
     "authors": [

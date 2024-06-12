@@ -9,6 +9,7 @@ use Bviguier\Siglot\Internal\SignalMethod;
 use Bviguier\Siglot\Internal\SlotMethod;
 use Bviguier\Siglot\SiglotError;
 use Bviguier\Siglot\SignalEvent;
+use Bviguier\Siglot\Tests\Support\FakeEmitterTrait;
 use PHPUnit\Framework\TestCase;
 
 class SlotMethodTest extends TestCase
@@ -94,16 +95,16 @@ class SlotMethodTest extends TestCase
 
     public function testExceptionThrownWhenClosureIsNotBoundToObject(): void
     {
-        $this->expectException(SiglotError::class);
-        $this->expectExceptionMessage('Closure is not bound to an object');
+        self::expectException(SiglotError::class);
+        self::expectExceptionMessage('Closure is not bound to an object');
 
         SlotMethod::fromClosure(static fn() => null);
     }
 
     public function testExceptionThrownWhenMethodDoesNotExist(): void
     {
-        $this->expectException(SiglotError::class);
-        $this->expectExceptionMessage('Attempt to create a Slot from unknown method');
+        self::expectException(SiglotError::class);
+        self::expectExceptionMessage('Attempt to create a Slot from unknown method');
 
         SlotMethod::fromClosure(fn() => null);
     }
@@ -111,6 +112,7 @@ class SlotMethodTest extends TestCase
     public function testFromWrappedSignal(): void
     {
         $object = new class () implements Emitter {
+            use FakeEmitterTrait;
             public function mySignal(int $int, string $string): SignalEvent
             {
                 return SignalEvent::auto();

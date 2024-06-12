@@ -9,6 +9,7 @@ use Bviguier\Siglot\Internal\Connection;
 use Bviguier\Siglot\Internal\SignalMethod;
 use Bviguier\Siglot\Internal\SlotMethod;
 use Bviguier\Siglot\SignalEvent;
+use Bviguier\Siglot\Tests\Support\FakeEmitterTrait;
 use PHPUnit\Framework\TestCase;
 
 class ConnectionTest extends TestCase
@@ -17,6 +18,7 @@ class ConnectionTest extends TestCase
     {
         $connection = Connection::fromSignal(SignalMethod::fromClosure(
             (new class () implements Emitter {
+                use FakeEmitterTrait;
                 public function mySignal(): SignalEvent
                 {
                     return SignalEvent::auto();
@@ -46,6 +48,7 @@ class ConnectionTest extends TestCase
     {
         $connectionSrc = Connection::fromSignal(SignalMethod::fromClosure(
             (new class () implements Emitter {
+                use FakeEmitterTrait;
                 public function mySignal(): SignalEvent
                 {
                     return SignalEvent::auto();
@@ -55,6 +58,7 @@ class ConnectionTest extends TestCase
 
         $connectionDst = Connection::fromSignal(SignalMethod::fromClosure(
             ($signalObject = new class () implements Emitter {
+                use FakeEmitterTrait;
                 public function mySignal(): SignalEvent
                 {
                     return SignalEvent::auto();

@@ -4,4 +4,10 @@ declare(strict_types=1);
 
 namespace Bviguier\Siglot;
 
-interface Emitter {}
+use Bviguier\Siglot\Internal\Connector;
+use Bviguier\Siglot\Internal\SignalMethod;
+
+interface Emitter
+{
+    public function connector(SignalMethod $signal): Connector;
+}
