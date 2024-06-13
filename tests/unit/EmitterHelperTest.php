@@ -23,7 +23,7 @@ class EmitterHelperTest extends TestCase
             SlotMethod::fromClosure($receiver->mySlot(...))
         );
 
-        $emitter->emitMySignal();
+        $emitter->emit($emitter->MySignal());
 
         self::assertSame(1, $receiver->nbCalls());
     }
