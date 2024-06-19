@@ -29,7 +29,7 @@
         "siglot:local-ci": "Run all steps of the local CI process"
     },
     "scripts": {
-        "siglot:phpstan": "phpstan analyse --memory-limit 1G",
+        "siglot:phpstan": "phpstan analyse -v --memory-limit 1G",
         "siglot:phpunit": "phpunit",
         "siglot:cs-fixer": "php-cs-fixer check",
         "siglot:cs-fixer:fix": "php-cs-fixer fix",
