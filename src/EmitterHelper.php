@@ -12,10 +12,11 @@ trait EmitterHelper
 
         return $this->signalManager->connector($signal);
     }
-    private ?Internal\SignalManager $signalManager = null;
 
-    private function emit(SignalEvent $signalEvent): void
+    protected function emit(SignalEvent $signalEvent): void
     {
         $this->signalManager?->emit($signalEvent);
     }
+
+    private ?Internal\SignalManager $signalManager = null;
 }
