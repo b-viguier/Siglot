@@ -32,7 +32,7 @@
     "scripts": {
         "siglot:phpstan": "phpstan analyse -v --memory-limit 1G",
         "siglot:phpunit": "phpunit",
-        "siglot:cs-fixer": "php-cs-fixer check",
+        "siglot:cs-fixer": "php-cs-fixer check -v --diff",
         "siglot:cs-fixer:fix": "php-cs-fixer fix",
         "siglot:local-ci": [
             "@siglot:phpstan",

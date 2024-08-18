@@ -53,7 +53,7 @@ class SlotMethodTest extends TestCase
 
     public function testInvocation(): void
     {
-        $receiver = new class () {
+        $receiver = new class() {
             /** @return array{0:int,1:string} */
             public function mySlot(int $int, string $string): array
             {
@@ -68,7 +68,7 @@ class SlotMethodTest extends TestCase
 
     public function testCreationFromPrivateMethod(): void
     {
-        $receiver = new class () {
+        $receiver = new class() {
             private function myPrivateSlot(): string
             {
                 return 'private';
@@ -106,7 +106,7 @@ class SlotMethodTest extends TestCase
 
     public function testFromWrappedSignal(): void
     {
-        $object = new class () implements Emitter {
+        $object = new class() implements Emitter {
             use FakeEmitterTrait;
             public function mySignal(int $int, string $string): SignalEvent
             {

@@ -54,7 +54,7 @@ class ChildClass extends ParentClass implements ChildInterface {}
 
 class OtherClass {}
 
-$emitter = new class () implements Emitter {
+$emitter = new class() implements Emitter {
     use FakeEmitterTrait;
 
     public function string(string $string): SignalEvent
@@ -83,7 +83,7 @@ $emitter = new class () implements Emitter {
     }
 };
 
-$receiver = new class () {
+$receiver = new class() {
     public function int(int $int): void {}
 
     public function parentClass(ParentClass $parentClass): void {}

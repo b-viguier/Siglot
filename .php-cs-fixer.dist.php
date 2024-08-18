@@ -11,6 +11,7 @@ return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)
     ->setRules([
         '@PSR12' => true,
+        '@PSR2' => true,
         'function_declaration' => [
             'closure_function_spacing' => 'none',
             'closure_fn_spacing' => 'none',
@@ -25,4 +26,5 @@ return (new PhpCsFixer\Config())
         'ordered_class_elements' => ['order' => ['use_trait', 'public', 'protected', 'private']],
         'single_line_empty_body' => true,
     ])
+    ->setLineEnding(PHP_EOL)
     ->setFinder($finder);

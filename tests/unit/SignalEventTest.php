@@ -12,7 +12,7 @@ class SignalEventTest extends TestCase
 {
     public function testAutoCreation(): void
     {
-        $emitter = new class () {
+        $emitter = new class() {
             /** @param mixed[] $array */
             public function myMethod(int $int, string $string, array $array, object $obj): SignalEvent
             {
@@ -37,7 +37,7 @@ class SignalEventTest extends TestCase
 
     public function testAutoCreationDoesNotHandleReferences(): void
     {
-        $emitter = new class () {
+        $emitter = new class() {
             public function myMethod(int &$int): SignalEvent
             {
                 return SignalEvent::auto();
@@ -53,7 +53,7 @@ class SignalEventTest extends TestCase
 
     public function testAutoCreationFromStaticFunctionThrowsAnError(): void
     {
-        $emitter = new class () {
+        $emitter = new class() {
             public static function myMethod(): SignalEvent
             {
                 return SignalEvent::auto();
@@ -74,7 +74,7 @@ class SignalEventTest extends TestCase
 
     public function testAutoCreationFromFirstClassCallableSyntaxIsHandled(): void
     {
-        $emitter = new class () {
+        $emitter = new class() {
             public function myMethod(int $int): SignalEvent
             {
                 return SignalEvent::auto();
@@ -91,7 +91,7 @@ class SignalEventTest extends TestCase
 
     public function testDefaultValuesAreNotHandled(): void
     {
-        $emitter = new class () {
+        $emitter = new class() {
             /** @param mixed[] $array */
             public function myMethod(int $int = 1, string $string = 'string', array $array = ['array'], object $obj = null): SignalEvent
             {
@@ -105,7 +105,7 @@ class SignalEventTest extends TestCase
 
     public function testArgsArePositional(): void
     {
-        $emitter = new class () {
+        $emitter = new class() {
             public function myMethod(int $int, string $string, object $obj): SignalEvent
             {
                 return SignalEvent::auto();
@@ -127,7 +127,7 @@ class SignalEventTest extends TestCase
 
     public function testVariadicArgumentsAreHandled(): void
     {
-        $emitter = new class () {
+        $emitter = new class() {
             public function myMethod(string $string, int ...$variadic): SignalEvent
             {
                 return SignalEvent::auto();
@@ -141,7 +141,7 @@ class SignalEventTest extends TestCase
 
     public function testExtraArgumentsAreHandled(): void
     {
-        $emitter = new class () {
+        $emitter = new class() {
             public function myMethod(int $int, string $string): SignalEvent
             {
                 return SignalEvent::auto();
@@ -155,7 +155,7 @@ class SignalEventTest extends TestCase
 
     public function testAutoCreationFromPrivateMethod(): void
     {
-        $emitter = new class () {
+        $emitter = new class() {
             private function myMethod(int ...$args): SignalEvent
             {
                 return SignalEvent::auto();

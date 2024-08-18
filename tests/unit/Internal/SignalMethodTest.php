@@ -53,7 +53,7 @@ class SignalMethodTest extends TestCase
 
     public function testInvocation(): void
     {
-        $emitter = new class () implements Emitter {
+        $emitter = new class() implements Emitter {
             use FakeEmitterTrait;
             public function mySignal(int $int, string $string): SignalEvent
             {
@@ -71,7 +71,7 @@ class SignalMethodTest extends TestCase
 
     public function testCreationFromPrivateMethod(): void
     {
-        $emitter = new class () implements Emitter {
+        $emitter = new class() implements Emitter {
             use FakeEmitterTrait;
             private function myPrivateSignal(string $string): SignalEvent
             {
@@ -113,7 +113,7 @@ class SignalMethodTest extends TestCase
         self::expectException(SiglotError::class);
         self::expectExceptionMessage('Attempt to create a Signal from unknown method');
 
-        $object = new class () implements Emitter {
+        $object = new class() implements Emitter {
             use FakeEmitterTrait;
             public function createClosure(): \Closure
             {
@@ -139,14 +139,14 @@ class SignalMethodTest extends TestCase
     public static function invalidSignalMethodProvider(): iterable
     {
         yield 'Closure does not return a SignalEvent object' => [
-            new class () implements Emitter {
+            new class() implements Emitter {
                 use FakeEmitterTrait;
                 public function mySignal(): void {}
             },
         ];
 
         yield 'Closure returns nullable type' => [
-            new class () implements Emitter {
+            new class() implements Emitter {
                 use FakeEmitterTrait;
                 public function mySignal(): SignalEvent|null
                 {
@@ -156,7 +156,7 @@ class SignalMethodTest extends TestCase
         ];
 
         yield 'Closure returns union' => [
-            new class () implements Emitter {
+            new class() implements Emitter {
                 use FakeEmitterTrait;
                 public function mySignal(): SignalEvent|int
                 {

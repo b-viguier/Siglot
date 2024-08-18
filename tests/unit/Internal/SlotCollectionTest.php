@@ -94,7 +94,7 @@ class SlotCollectionTest extends TestCase
 
     public function testSeveralSlotsFromSameReceiverAreAllowed(): void
     {
-        $receiver = new class () {
+        $receiver = new class() {
             /** @var array<array{0:string,1:string}> */
             public array $calls = [];
             public function mySlot1(string $string): void
@@ -122,7 +122,7 @@ class SlotCollectionTest extends TestCase
     {
         $receiver = new SpyReceiver();
 
-        $receiverAddingSlot = new class () {
+        $receiverAddingSlot = new class() {
             public SlotMethod $slotToAdd;
             public int $nbCalls = 0;
 
@@ -153,7 +153,7 @@ class SlotCollectionTest extends TestCase
         $receiver3 = new SpyReceiver();
 
 
-        $receiverRemovingPreviousSlot = new class () {
+        $receiverRemovingPreviousSlot = new class() {
             public SlotMethod $slotToRemove;
             public int $nbCalls = 0;
 
