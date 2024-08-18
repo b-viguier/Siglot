@@ -21,6 +21,7 @@
             "name": "Benoit Viguier"
         }
     ],
+    "license": ["MIT"],
     "scripts-descriptions": {
         "siglot:phpstan": "Run PhpStan static analysis",
         "siglot:phpunit": "Run PhpUnit unit tests",
