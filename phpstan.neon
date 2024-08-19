@@ -5,4 +5,4 @@ parameters:
         - tests
         - examples
     bootstrapFiles:
-        - /usr/local/bin//phpunit
+        - tests/phpstan-bootstrap.php
