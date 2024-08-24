@@ -1,4 +1,4 @@
-# Siglot
+# Siglot [![Siglot CI](https://github.com/b-viguier/Siglot/actions/workflows/ci.yml/badge.svg)](https://github.com/b-viguier/Siglot/actions/workflows/ci.yml)
 
 ## Local Development
 
