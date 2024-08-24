@@ -3,7 +3,7 @@ services:
   php-8.1:
     tty: true
     build:
-      context: .
+      context: php
       args:
         PHP_VERSION: 8.1
     volumes:
@@ -12,7 +12,7 @@ services:
   php-8.2:
     tty: true
     build:
-      context: .
+      context: php
       args:
         PHP_VERSION: 8.2
     volumes:
@@ -21,8 +21,20 @@ services:
   php-8.3:
     tty: true
     build:
-      context: .
+      context: php
       args:
         PHP_VERSION: 8.3
     volumes:
       - ..:/app
+
+  jekyll:
+    tty: true
+    build:
+      context: ../
+      dockerfile: docker/jekyll/Dockerfile
+    volumes:
+      - ../docs:/srv/jekyll
+    ports:
+      - "4000:4000"
+      - "35729:35729"
+    command: bundle exec jekyll serve --watch --incremental  --host 0.0.0.0 --livereload
