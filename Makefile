@@ -15,7 +15,8 @@ build-jekyll: ## Build the Jekyll container only (useful to update dependencies)
 
 jekyll-clean: ## Clean all Jekyll content
 	$(DOCKER_COMPOSE) exec jekyll $(EXEC_SHELL) -c "bundle exec jekyll clean"
-	$(DOCKER_COMPOSE) exec jekyll $(EXEC_SHELL) -c "bundle exec jekyll build"
+	$(DOCKER_COMPOSE) down -v jekyll
+	$(DOCKER_COMPOSE) up jekyll -d
 .PHONY: jekyll-clean
 
 up: ## Start the docker containers
