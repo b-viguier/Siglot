@@ -29,7 +29,7 @@ to decouple events' sender and receiver.
 To install Siglot, you can use [Composer](https://getcomposer.org/):
 
 ```bash
-composer require b-viguier/siglot
+composer require bviguier/siglot
 ```
 
 
