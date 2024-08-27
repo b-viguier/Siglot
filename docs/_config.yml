@@ -1,8 +1,8 @@
 title: Siglot
 description: >- # this means to ignore newlines until "baseurl:"
   Signals and Slots library for PHP
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+baseurl: "/Siglot" # the subpath of your site, e.g. /blog
+url: "https://b-viguier.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: b_viguier
 github_username:  b-viguier
 
@@ -56,6 +56,8 @@ aux_links:
     - https://github.com/b-viguier/Siglot
 back_to_top: true
 back_to_top_text: "Back to top"
+logo: "/assets/Sg.png"
+favicon_ico: "/assets/favicon.ico"
 mermaid:
   # Version of mermaid library
   # Pick an available version from https://cdn.jsdelivr.net/npm/mermaid/

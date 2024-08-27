@@ -44,7 +44,7 @@ trait to implement the [`Emitter`](https://github.com/b-viguier/Siglot/blob/main
 This trait provides the useful `emit(SignalEvent $signalEvent): void` method.
 The `emit` function is `protected`,
 by design, as it's best to only emit signals from the class that defines them and its subclasses.
-You can find more details in the [Advanced](/advanced) section.
+You can find more details in the [Advanced]({% link 03_advanced.md %}) section.
 
 ```php
 class MyEmitter implements Emitter
@@ -71,9 +71,9 @@ instance SHOULD be **immediately** _emitted_ using the `emit` method.
 > * A class can define multiple signals.
 > * There are no restrictions on the type of parameters a signal can have.
 > * Although there are also no restrictions on the number of parameters,
-> it is recommended to keep it low in order to be compatible with existing connection functions (see [Connections](/connections)).
+> it is recommended to keep it low in order to be compatible with existing connection functions (see [Connections]({% link 02_connections.md %})).
 > * The visibility of a signal function only affects its capability to be called or connected,
-  following the usual rules of visibility in PHP (see [Connections Visibility](/connections#visibility)).
+  following the usual rules of visibility in PHP (see [Connections Visibility]({% link 02_connections.md %}#visibility)).
 
 ## Slots
 Any non-static object method can be considered a slot.
@@ -95,8 +95,8 @@ class MyReceiver
 {: .good_to_know }
 > * There are no restrictions on the type of parameters a slot can have.
 > * Although there are also no restrictions on the number of parameters,
-> it is recommended to keep it low in order to be compatible with existing connection functions (see [Connections](/connections)).
+> it is recommended to keep it low in order to be compatible with existing connection functions (see [Connections]({% link 02_connections.md %})).
 > * The visibility of a slot function only affects its capability to be called or connected,
-> following the usual rules of visibility in PHP (see  [Connections Visibility](/connections#visibility)).
-> * A slot SHOULD NOT return a value, as there is no way to retrieve it from the signal emitter (see [Connections](/connections)).
+> following the usual rules of visibility in PHP (see [Connections Visibility]({% link 02_connections.md %}#visibility)).
+> * A slot SHOULD NOT return a value, as there is no way to retrieve it from the signal emitter (see [Connections]({% link 02_connections.md %})).
 

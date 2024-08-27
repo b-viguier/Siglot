@@ -1,5 +1,5 @@
 ---
-title: Getting Started
+title: Siglot
 nav_order: 0
 permalink: /
 ---
