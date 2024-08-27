@@ -28,7 +28,7 @@ Siglot::connect1($editor->nameChanged(...), $receiver->onNewName(...));
 It is **highly** discouraged to use something else than
 [first-class callable syntax](https://www.php.net/manual/en/functions.first_class_callable_syntax.php)
 to connect _signals_ and _slots_, even if it is technically possible.
-Refer to the [Advanced]({% link 03_advanced.md %}) section for more details. 
+Refer to the [Advanced]({{ site.baseurl }}{% link 03_advanced.md %}) section for more details. 
 
 
 {: .good_to_know }
